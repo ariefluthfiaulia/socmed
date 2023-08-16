@@ -24,9 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -74,8 +72,7 @@ public class PostServiceTest {
 
     // Assert
     assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
-    assertEquals(HttpStatus.BAD_REQUEST.getReasonPhrase(),
-        response.getBody().get(ResponseUtil.RESPONSE_API_STATUS_MESSAGE));
+    assertEquals("Invalid input", response.getBody().get(ResponseUtil.RESPONSE_API_STATUS_MESSAGE));
   }
 
   @Test
@@ -92,8 +89,7 @@ public class PostServiceTest {
 
     // Assert
     assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
-    assertEquals(HttpStatus.BAD_REQUEST.getReasonPhrase(),
-        response.getBody().get(ResponseUtil.RESPONSE_API_STATUS_MESSAGE));
+    assertEquals("User not found", response.getBody().get(ResponseUtil.RESPONSE_API_STATUS_MESSAGE));
   }
 
   @Test
@@ -137,9 +133,9 @@ public class PostServiceTest {
     assertEquals(HttpStatus.OK.value(), response.getStatusCode().value());
     assertEquals(HttpStatus.OK.getReasonPhrase(), response.getBody().get(ResponseUtil.RESPONSE_API_STATUS_MESSAGE));
 
-    Page<Post> retrievedPage = (Page<Post>) response.getBody().get(ResponseUtil.RESPONSE_API_BODY);
+    List<Post> retrievedPage = (List<Post>) response.getBody().get(ResponseUtil.RESPONSE_API_BODY);
     assertNotNull(retrievedPage);
-    assertEquals(posts.size(), retrievedPage.getTotalElements());
+    assertEquals(posts.size(), retrievedPage.size());
   }
 
   @Test
@@ -155,9 +151,8 @@ public class PostServiceTest {
 
     // Assert
     assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
-    assertEquals(HttpStatus.BAD_REQUEST.getReasonPhrase(), response.getBody().get(ResponseUtil.RESPONSE_API_STATUS_MESSAGE));
+    assertEquals(HttpStatus.BAD_REQUEST.getReasonPhrase(),
+        response.getBody().get(ResponseUtil.RESPONSE_API_STATUS_MESSAGE));
     assertNull(response.getBody().get(ResponseUtil.RESPONSE_API_BODY));
   }
-
-
 }

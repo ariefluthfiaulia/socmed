@@ -29,8 +29,7 @@ public class PostServiceImpl implements PostService {
   public ResponseEntity<Map<String, Object>> createPost(PostDto postDto) {
     if (postDto == null || postDto.getUsername() == null || postDto.getContent() == null || postDto.getUsername()
         .isBlank() || postDto.getContent().isBlank()) {
-      return ResponseUtil.returnErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(),
-          null);
+      return ResponseUtil.returnErrorResponse(HttpStatus.BAD_REQUEST.value(), "Invalid input", null);
     }
 
     if (postDto.getContent().length() > 100) {
@@ -39,14 +38,14 @@ public class PostServiceImpl implements PostService {
     }
 
     Optional<User> user = userRepository.findByUsername(postDto.getUsername());
-    if (user.isPresent()) {
-      Post post = Post.builder().user(user.get()).content(postDto.getContent()).createdDate(new Date()).build();
-      return ResponseUtil.returnResponse(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(),
-          postRepository.save(post));
-    } else {
-      return ResponseUtil.returnErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(),
+    if (!user.isPresent()) {
+      return ResponseUtil.returnErrorResponse(HttpStatus.BAD_REQUEST.value(), "User not found",
           null);
     }
+
+    Post post = Post.builder().user(user.get()).content(postDto.getContent()).createdDate(new Date()).build();
+    return ResponseUtil.returnResponse(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(),
+        postRepository.save(post));
   }
 
   @Override

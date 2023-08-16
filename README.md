@@ -22,9 +22,8 @@ Postr is an anonymous social media application that allows users to post text in
 ## Scope
 The Postr application API will include the following endpoints:
 - `[POST] /api/users`: Create a new user.
-- `[GET] /api/users/{username}`: Get user details by username.
 - `[POST] /api/posts`: Create a new post.
 - `[GET] /api/posts?user={username}&page={page}&size={size}`: Get a user's newest posts with pagination.
+- `[GET] /api/posts?postId={postId}`: Retrieve post and all of their replies.
 - `[POST] /api/replies`: Reply to a post.
-- `[GET] /api/replies?post={postId}&page={page}&size={size}`: Get replies to a post with pagination.
 The focus of this project is to provide a functional backend API that supports the basic requirements of the Postr application.
