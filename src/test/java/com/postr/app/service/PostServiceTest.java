@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 
 @SpringBootTest
 public class PostServiceTest {
+
   private final UserRepository userRepository = mock(UserRepository.class);
   private final PostRepository postRepository = mock(PostRepository.class);
   private final PostServiceImpl postService = new PostServiceImpl(postRepository, userRepository);
@@ -64,7 +65,8 @@ public class PostServiceTest {
 
     // Assert
     assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
-    assertEquals(HttpStatus.BAD_REQUEST.getReasonPhrase(), response.getBody().get(ResponseUtil.RESPONSE_API_STATUS_MESSAGE));
+    assertEquals(HttpStatus.BAD_REQUEST.getReasonPhrase(),
+        response.getBody().get(ResponseUtil.RESPONSE_API_STATUS_MESSAGE));
   }
 
   @Test
@@ -81,6 +83,26 @@ public class PostServiceTest {
 
     // Assert
     assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
-    assertEquals(HttpStatus.BAD_REQUEST.getReasonPhrase(), response.getBody().get(ResponseUtil.RESPONSE_API_STATUS_MESSAGE));
+    assertEquals(HttpStatus.BAD_REQUEST.getReasonPhrase(),
+        response.getBody().get(ResponseUtil.RESPONSE_API_STATUS_MESSAGE));
+  }
+
+  @Test
+  void testCreatePost_ContentExceedsMaxLength() {
+    // Arrange
+    PostDto postDto = new PostDto();
+    postDto.setUsername("testUser");
+    postDto.setContent("This is a very long content exceeding 100 characters. "
+        + "This is a very long content exceeding 100 characters.");
+
+    User user = new User();
+    when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
+
+    // Act
+    ResponseEntity<Map<String, Object>> response = postService.createPost(postDto);
+
+    // Assert
+    assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
+    assertEquals("Content exceeds maximum length", response.getBody().get(ResponseUtil.RESPONSE_API_STATUS_MESSAGE));
   }
 }

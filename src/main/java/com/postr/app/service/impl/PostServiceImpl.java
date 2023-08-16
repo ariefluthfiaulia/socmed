@@ -33,6 +33,11 @@ public class PostServiceImpl implements PostService {
           null);
     }
 
+    if (postDto.getContent().length() > 100) {
+      return ResponseUtil.returnErrorResponse(HttpStatus.BAD_REQUEST.value(), "Content exceeds maximum length",
+          null);
+    }
+
     Optional<User> user = userRepository.findByUsername(postDto.getUsername());
     if (user.isPresent()) {
       Post post = Post.builder().user(user.get()).content(postDto.getContent()).build();
