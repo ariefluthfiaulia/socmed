@@ -26,7 +26,6 @@ public abstract class PrimaryAudit implements Serializable {
   @GeneratedValue(generator = "system-uuid")
   @GenericGenerator(name = "system-uuid", strategy = "uuid")
   @Column(name = "id", updatable = false, nullable = false)
-  @JsonIgnore
   @Id
   private String id;
 

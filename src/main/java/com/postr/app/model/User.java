@@ -1,5 +1,6 @@
 package com.postr.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.postr.app.common.PrimaryAudit;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -16,6 +17,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Getter
 @Setter
+@JsonIgnoreProperties("hibernateLazyInitializer")
 public class User extends PrimaryAudit {
 
   private String username;

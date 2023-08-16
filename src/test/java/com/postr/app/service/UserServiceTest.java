@@ -11,7 +11,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.postr.app.dto.UserDto;
+import com.postr.app.dto.request.UserRequestDto;
 import com.postr.app.model.User;
 import com.postr.app.repository.UserRepository;
 import com.postr.app.service.impl.UserServiceImpl;
@@ -37,19 +37,19 @@ public class UserServiceTest {
   @Test
   public void testCreateUser_Success() {
     // Arrange
-    UserDto userDto = new UserDto();
-    userDto.setUsername("newUsername");
+    UserRequestDto userRequestDto = new UserRequestDto();
+    userRequestDto.setUsername("newUsername");
 
     when(userRepository.findByUsername("newUsername")).thenReturn(Optional.empty());
-    when(modelMapper.map(userDto, User.class)).thenReturn(new User());
+    when(modelMapper.map(userRequestDto, User.class)).thenReturn(new User());
     when(userRepository.save(any(User.class))).thenReturn(new User());
 
     // Act
-    ResponseEntity<Map<String, Object>> response = userService.createUser(userDto);
+    ResponseEntity<Map<String, Object>> response = userService.createUser(userRequestDto);
 
     // Assert
     verify(userRepository).findByUsername("newUsername");
-    verify(modelMapper).map(userDto, User.class);
+    verify(modelMapper).map(userRequestDto, User.class);
     verify(userRepository).save(any(User.class));
 
     assertEquals(HttpStatus.OK.value(), response.getStatusCode().value());
@@ -60,39 +60,39 @@ public class UserServiceTest {
   @Test
   public void testCreateUser_UsernameExists() {
     // Arrange
-    UserDto userDto = new UserDto();
-    userDto.setUsername("existingUsername");
+    UserRequestDto userRequestDto = new UserRequestDto();
+    userRequestDto.setUsername("existingUsername");
 
     when(userRepository.findByUsername("existingUsername")).thenReturn(Optional.of(new User()));
 
     // Act
-    ResponseEntity<Map<String, Object>> response = userService.createUser(userDto);
+    ResponseEntity<Map<String, Object>> response = userService.createUser(userRequestDto);
 
     // Assert
     verify(userRepository).findByUsername("existingUsername");
-    verify(modelMapper, never()).map(any(UserDto.class), eq(User.class));
+    verify(modelMapper, never()).map(any(UserRequestDto.class), eq(User.class));
     verify(userRepository, never()).save(any(User.class));
 
     assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
-    assertEquals(HttpStatus.BAD_REQUEST.getReasonPhrase(), response.getBody().get(ResponseUtil.RESPONSE_API_STATUS_MESSAGE));
+    assertEquals("User not found", response.getBody().get(ResponseUtil.RESPONSE_API_STATUS_MESSAGE));
     assertNull(response.getBody().get(ResponseUtil.RESPONSE_API_BODY));
   }
 
   @Test
   public void testCreateUser_InvalidInput() {
     // Arrange
-    UserDto userDto = new UserDto();
+    UserRequestDto userRequestDto = new UserRequestDto();
 
     // Act
-    ResponseEntity<Map<String, Object>> response = userService.createUser(userDto);
+    ResponseEntity<Map<String, Object>> response = userService.createUser(userRequestDto);
 
     // Assert
     verify(userRepository, never()).findByUsername(anyString());
-    verify(modelMapper, never()).map(any(UserDto.class), eq(User.class));
+    verify(modelMapper, never()).map(any(UserRequestDto.class), eq(User.class));
     verify(userRepository, never()).save(any(User.class));
 
     assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
-    assertEquals(HttpStatus.BAD_REQUEST.getReasonPhrase(), response.getBody().get(ResponseUtil.RESPONSE_API_STATUS_MESSAGE));
+    assertEquals("Invalid input", response.getBody().get(ResponseUtil.RESPONSE_API_STATUS_MESSAGE));
     assertNull(response.getBody().get(ResponseUtil.RESPONSE_API_BODY));
   }
 }

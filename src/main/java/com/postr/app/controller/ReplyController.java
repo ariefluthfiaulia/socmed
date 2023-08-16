@@ -1,7 +1,6 @@
 package com.postr.app.controller;
 
-import com.postr.app.dto.PostDto;
-import com.postr.app.dto.ReplyDto;
+import com.postr.app.dto.request.ReplyRequestDto;
 import com.postr.app.service.interfaces.ReplyService;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,7 @@ public class ReplyController {
   private final ReplyService replyService;
 
   @PostMapping()
-  public ResponseEntity<Map<String, Object>> createReply(@RequestBody ReplyDto replyDto) {
-    return replyService.createReply(replyDto);
+  public ResponseEntity<Map<String, Object>> createReply(@RequestBody ReplyRequestDto replyRequestDto) {
+    return replyService.createReply(replyRequestDto);
   }
 }

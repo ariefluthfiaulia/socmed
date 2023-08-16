@@ -7,7 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.postr.app.dto.ReplyDto;
+import com.postr.app.dto.request.ReplyRequestDto;
 import com.postr.app.model.Post;
 import com.postr.app.model.Reply;
 import com.postr.app.model.User;
@@ -33,10 +33,10 @@ public class ReplyServiceTest {
   @Test
   void testCreateReply_Success() {
     // Arrange
-    ReplyDto replyDto = new ReplyDto();
-    replyDto.setUsername("testUser");
-    replyDto.setPostId("testPost");
-    replyDto.setContent("Test content");
+    ReplyRequestDto replyRequestDto = new ReplyRequestDto();
+    replyRequestDto.setUsername("testUser");
+    replyRequestDto.setPostId("testPost");
+    replyRequestDto.setContent("Test content");
 
     User user = new User();
     when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
@@ -48,7 +48,7 @@ public class ReplyServiceTest {
     when(replyRepository.save(any(Reply.class))).thenReturn(savedReply);
 
     // Act
-    ResponseEntity<Map<String, Object>> response = replyService.createReply(replyDto);
+    ResponseEntity<Map<String, Object>> response = replyService.createReply(replyRequestDto);
 
     // Assert
     assertEquals(HttpStatus.OK.value(), response.getStatusCode().value());
@@ -62,13 +62,13 @@ public class ReplyServiceTest {
   @Test
   void testCreateReply_InvalidInput() {
     // Arrange
-    ReplyDto replyDto = new ReplyDto();
-    replyDto.setUsername(""); // Invalid username
-    replyDto.setPostId(""); // Invalid username
-    replyDto.setContent("Test content");
+    ReplyRequestDto replyRequestDto = new ReplyRequestDto();
+    replyRequestDto.setUsername(""); // Invalid username
+    replyRequestDto.setPostId(""); // Invalid post
+    replyRequestDto.setContent("Test content");
 
     // Act
-    ResponseEntity<Map<String, Object>> response = replyService.createReply(replyDto);
+    ResponseEntity<Map<String, Object>> response = replyService.createReply(replyRequestDto);
 
     // Assert
     assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
@@ -78,10 +78,10 @@ public class ReplyServiceTest {
   @Test
   void testCreateReply_UserNotFound() {
     // Arrange
-    ReplyDto replyDto = new ReplyDto();
-    replyDto.setUsername("nonExistentUser");
-    replyDto.setPostId("postId");
-    replyDto.setContent("Test content");
+    ReplyRequestDto replyRequestDto = new ReplyRequestDto();
+    replyRequestDto.setUsername("nonExistentUser");
+    replyRequestDto.setPostId("postId");
+    replyRequestDto.setContent("Test content");
 
     when(userRepository.findByUsername("nonExistentUser")).thenReturn(Optional.empty());
 
@@ -89,7 +89,7 @@ public class ReplyServiceTest {
     when(postRepository.findById("testPost")).thenReturn(Optional.of(post));
 
     // Act
-    ResponseEntity<Map<String, Object>> response = replyService.createReply(replyDto);
+    ResponseEntity<Map<String, Object>> response = replyService.createReply(replyRequestDto);
 
     // Assert
     assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
@@ -99,10 +99,10 @@ public class ReplyServiceTest {
   @Test
   void testCreateReply_PostNotFound() {
     // Arrange
-    ReplyDto replyDto = new ReplyDto();
-    replyDto.setUsername("testUser");
-    replyDto.setPostId("nonExistentPost");
-    replyDto.setContent("Test content");
+    ReplyRequestDto replyRequestDto = new ReplyRequestDto();
+    replyRequestDto.setUsername("testUser");
+    replyRequestDto.setPostId("nonExistentPost");
+    replyRequestDto.setContent("Test content");
 
     User user = new User();
     when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
@@ -110,7 +110,7 @@ public class ReplyServiceTest {
     when(postRepository.findById("nonExistentPost")).thenReturn(Optional.empty());
 
     // Act
-    ResponseEntity<Map<String, Object>> response = replyService.createReply(replyDto);
+    ResponseEntity<Map<String, Object>> response = replyService.createReply(replyRequestDto);
 
     // Assert
     assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
@@ -120,10 +120,10 @@ public class ReplyServiceTest {
   @Test
   void testCreateReply_ContentExceedsMaxLength() {
     // Arrange
-    ReplyDto replyDto = new ReplyDto();
-    replyDto.setUsername("testUser");
-    replyDto.setPostId("testPostId");
-    replyDto.setContent("This is a very long content exceeding 100 characters. "
+    ReplyRequestDto replyRequestDto = new ReplyRequestDto();
+    replyRequestDto.setUsername("testUser");
+    replyRequestDto.setPostId("testPostId");
+    replyRequestDto.setContent("This is a very long content exceeding 100 characters. "
         + "This is a very long content exceeding 100 characters.");
 
     User user = new User();
@@ -133,7 +133,7 @@ public class ReplyServiceTest {
     when(postRepository.findById("testPostId")).thenReturn(Optional.of(post));
 
     // Act
-    ResponseEntity<Map<String, Object>> response = replyService.createReply(replyDto);
+    ResponseEntity<Map<String, Object>> response = replyService.createReply(replyRequestDto);
 
     // Assert
     assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());

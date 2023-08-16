@@ -1,6 +1,6 @@
 package com.postr.app.service.impl;
 
-import com.postr.app.dto.UserDto;
+import com.postr.app.dto.request.UserRequestDto;
 import com.postr.app.model.User;
 import com.postr.app.repository.UserRepository;
 import com.postr.app.service.interfaces.UserService;
@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
 
 @Service
 @RequiredArgsConstructor
@@ -24,20 +23,22 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public ResponseEntity<Map<String, Object>> createUser(UserDto userDto) {
-    if (userDto == null || userDto.getUsername() == null || userDto.getUsername().isBlank()) {
-      return ResponseUtil.returnErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(),
-          null);
+  public ResponseEntity<Map<String, Object>> createUser(UserRequestDto userRequestDto) {
+    if (isInvalidUserDto(userRequestDto)) {
+      return ResponseUtil.returnErrorResponse(HttpStatus.BAD_REQUEST.value(), "Invalid input", null);
     }
 
-    Optional<User> oldUser = userRepository.findByUsername(userDto.getUsername());
+    Optional<User> oldUser = userRepository.findByUsername(userRequestDto.getUsername());
     if (oldUser.isPresent()) {
-      return ResponseUtil.returnErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(),
-          null);
-    } else {
-      User user = modelMapper.map(userDto, User.class);
-      return ResponseUtil.returnResponse(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(),
-          userRepository.save(user));
+      return ResponseUtil.returnErrorResponse(HttpStatus.BAD_REQUEST.value(), "User not found", null);
     }
+
+    User user = modelMapper.map(userRequestDto, User.class);
+    return ResponseUtil.returnResponse(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(),
+        userRepository.save(user));
+  }
+
+  private boolean isInvalidUserDto(UserRequestDto userRequestDto) {
+    return userRequestDto == null || userRequestDto.getUsername() == null || userRequestDto.getUsername().isBlank();
   }
 }

@@ -1,4 +1,4 @@
-package com.postr.app.dto;
+package com.postr.app.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Builder
-public class ReplyDto {
-
+public class UserRequestDto {
   private String username;
-  private String postId;
-  private String content;
 }

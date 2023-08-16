@@ -1,16 +1,14 @@
 package com.postr.app.controller;
 
-import com.postr.app.dto.PostDto;
-import com.postr.app.dto.UserDto;
+import com.postr.app.dto.request.PostRequestDto;
 import com.postr.app.service.interfaces.PostService;
-import com.postr.app.service.interfaces.UserService;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,8 +23,8 @@ public class PostController {
   private final PostService postService;
 
   @PostMapping()
-  public ResponseEntity<Map<String, Object>> createPost(@RequestBody PostDto postDto) {
-    return postService.createPost(postDto);
+  public ResponseEntity<Map<String, Object>> createPost(@RequestBody PostRequestDto postRequestDto) {
+    return postService.createPost(postRequestDto);
   }
 
   @GetMapping()
@@ -36,5 +34,10 @@ public class PostController {
       @RequestParam(required = false, value = "size", defaultValue = "20") int size) {
     Pageable paging = PageRequest.of(page, size);
     return postService.getUserNewestPost(username, paging);
+  }
+
+  @GetMapping("/{id}")
+  public ResponseEntity<Map<String, Object>> getDetailPost(@PathVariable String id) {
+    return postService.getDetailPost(id);
   }
 }
