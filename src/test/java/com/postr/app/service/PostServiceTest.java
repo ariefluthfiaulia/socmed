@@ -2,8 +2,10 @@ package com.postr.app.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -14,10 +16,17 @@ import com.postr.app.repository.PostRepository;
 import com.postr.app.repository.UserRepository;
 import com.postr.app.service.impl.PostServiceImpl;
 import com.postr.app.util.ResponseUtil;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -105,4 +114,50 @@ public class PostServiceTest {
     assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
     assertEquals("Content exceeds maximum length", response.getBody().get(ResponseUtil.RESPONSE_API_STATUS_MESSAGE));
   }
+
+  @Test
+  public void testGetUserNewestPost_Success() {
+    // Arrange
+    String username = "testUser";
+    Pageable paging = Pageable.ofSize(10);
+
+    List<Post> posts = new ArrayList<>();
+    User user = User.builder().username("testUser").build();
+    Post post = Post.builder().content("test").user(user).build();
+    posts.add(post);
+
+    when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+    when(postRepository.findByUserOrderByCreatedDateDesc(eq(user), any(Pageable.class)))
+        .thenReturn(new PageImpl<>(posts, paging, posts.size()));
+
+    // Act
+    ResponseEntity<Map<String, Object>> response = postService.getUserNewestPost(username, paging);
+
+    // Assert
+    assertEquals(HttpStatus.OK.value(), response.getStatusCode().value());
+    assertEquals(HttpStatus.OK.getReasonPhrase(), response.getBody().get(ResponseUtil.RESPONSE_API_STATUS_MESSAGE));
+
+    Page<Post> retrievedPage = (Page<Post>) response.getBody().get(ResponseUtil.RESPONSE_API_BODY);
+    assertNotNull(retrievedPage);
+    assertEquals(posts.size(), retrievedPage.getTotalElements());
+  }
+
+  @Test
+  public void testGetUserNewestPost_UserNotFound() {
+    // Arrange
+    String username = "nonExistentUser";
+    Pageable paging = Pageable.ofSize(10);
+
+    when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+    // Act
+    ResponseEntity<Map<String, Object>> response = postService.getUserNewestPost(username, paging);
+
+    // Assert
+    assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
+    assertEquals(HttpStatus.BAD_REQUEST.getReasonPhrase(), response.getBody().get(ResponseUtil.RESPONSE_API_STATUS_MESSAGE));
+    assertNull(response.getBody().get(ResponseUtil.RESPONSE_API_BODY));
+  }
+
+
 }
