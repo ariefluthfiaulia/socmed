@@ -26,8 +26,9 @@ public class PostServiceImpl implements PostService {
 
   @Override
   @Transactional
-  public ResponseEntity<Map<String, Object>> createPost(PostDto postDto, BindingResult results) {
-    if (postDto == null || postDto.getUsername().isBlank() || postDto.getContent().isBlank()) {
+  public ResponseEntity<Map<String, Object>> createPost(PostDto postDto) {
+    if (postDto == null || postDto.getUsername() == null || postDto.getContent() == null || postDto.getUsername()
+        .isBlank() || postDto.getContent().isBlank()) {
       return ResponseUtil.returnErrorResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(),
           null);
     }
