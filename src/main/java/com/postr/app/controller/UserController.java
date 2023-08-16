@@ -1,14 +1,9 @@
 package com.postr.app.controller;
 
-import com.postr.app.dto.ErrorDto;
 import com.postr.app.dto.UserDto;
 import com.postr.app.service.interfaces.UserService;
-import com.postr.app.util.ResponseUtil;
-import com.postr.app.validator.UserValidator;
-import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +19,7 @@ public class UserController {
   private final UserService userService;
 
   @PostMapping()
-  public ResponseEntity<Map<String, Object>> createUser(@RequestBody UserDto userDto, BindingResult results) {
-    return userService.createUser(userDto, results);
+  public ResponseEntity<Map<String, Object>> createUser(@RequestBody UserDto userDto) {
+    return userService.createUser(userDto);
   }
 }
