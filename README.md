@@ -164,6 +164,16 @@ The Postr application API will include the following endpoints:
 ## Class Diagram
 ![Blank diagram](https://github.com/ariefluthfiaulia/socmed/assets/30741134/88a22fc8-d550-4850-8fe5-4f7d3b60db1b)
 
+## Sequence Diagram
+### Create User Process
+![Blank diagram (1)](https://github.com/ariefluthfiaulia/socmed/assets/30741134/2d6cd45d-f479-490b-85fb-2b131ea6fb2a)
+
+### Create Post Process
+![Blank diagram (4)](https://github.com/ariefluthfiaulia/socmed/assets/30741134/440dc7cb-87da-4c29-9c70-5db5f46b1af8)
+
+### Create Reply Process
+![Blank diagram (3)](https://github.com/ariefluthfiaulia/socmed/assets/30741134/50880d94-a64e-4411-8d91-47a7fe753b36)
+
 ## How to Run
 - Clone the repository using this command `git clone https://github.com/ariefluthfiaulia/socmed.git`.
 - Make sure you have installed PostgreSQL on your local computer.
