@@ -161,6 +161,9 @@ The Postr application API will include the following endpoints:
   The focus of this project is to provide a functional backend API that supports the basic requirements of the Postr
   application.
 
+## Class Diagram
+![Blank diagram](https://github.com/ariefluthfiaulia/socmed/assets/30741134/88a22fc8-d550-4850-8fe5-4f7d3b60db1b)
+
 ## How to Run
 - Clone the repository using this command `git clone https://github.com/ariefluthfiaulia/socmed.git`.
 - Make sure you have installed PostgreSQL on your local computer.
