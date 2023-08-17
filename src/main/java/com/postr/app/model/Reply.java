@@ -37,7 +37,6 @@ public class Reply extends PrimaryAudit {
   private User user;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JsonBackReference
   @JoinColumn(name = "post_id", referencedColumnName = "id")
   private Post post;
 

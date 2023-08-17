@@ -47,8 +47,4 @@ public class Post extends PrimaryAudit {
   void onCreate() {
     this.createdDate = new Date();
   }
-
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "post")
-  @JsonManagedReference
-  private List<Reply> replies;
 }

@@ -1,6 +1,8 @@
 package com.postr.app.service.impl;
 
 import com.postr.app.dto.request.PostRequestDto;
+import com.postr.app.dto.response.PostDetailResponseDto;
+import com.postr.app.dto.response.ReplyResponseDto;
 import com.postr.app.model.Post;
 import com.postr.app.model.Reply;
 import com.postr.app.model.User;
@@ -9,10 +11,12 @@ import com.postr.app.repository.ReplyRepository;
 import com.postr.app.repository.UserRepository;
 import com.postr.app.service.interfaces.PostService;
 import com.postr.app.util.ResponseUtil;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -44,7 +48,11 @@ public class PostServiceImpl implements PostService {
       return ResponseUtil.returnErrorResponse(HttpStatus.BAD_REQUEST.value(), "User not found", null);
     }
 
-    Post post = createNewPost(user.get(), postRequestDto.getContent());
+    Post post = Post.builder()
+        .user(user.get())
+        .content(postRequestDto.getContent())
+        .build();
+
     return ResponseUtil.returnResponse(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(),
         postRepository.save(post));
   }
@@ -52,13 +60,6 @@ public class PostServiceImpl implements PostService {
   private boolean isInvalidPostDto(PostRequestDto postRequestDto) {
     return postRequestDto == null || postRequestDto.getUsername() == null || postRequestDto.getContent() == null ||
         postRequestDto.getUsername().isBlank() || postRequestDto.getContent().isBlank();
-  }
-
-  private Post createNewPost(User user, String content) {
-    return Post.builder()
-        .user(user)
-        .content(content)
-        .build();
   }
 
   @Override
@@ -89,9 +90,23 @@ public class PostServiceImpl implements PostService {
     }
 
     Post post = postOptional.get();
-    List<Reply> replies = replyRepository.findByPostOrderByCreatedDateDesc(post);
-    post.setReplies(replies);
+    PostDetailResponseDto postDetailResponseDto = PostDetailResponseDto.builder()
+        .username(post.getUser().getUsername())
+        .content(post.getContent())
+        .build();
 
-    return ResponseUtil.returnResponse(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), post);
+    List<Reply> replies = replyRepository.findByPostOrderByCreatedDate(postOptional.get());
+    List<ReplyResponseDto> replyResponseDtoList = new ArrayList<>();
+    for (Reply reply : replies) {
+      ReplyResponseDto replyResponseDto = ReplyResponseDto.builder()
+          .username(reply.getUser().getUsername())
+          .content(reply.getContent())
+          .build();
+      replyResponseDtoList.add(replyResponseDto);
+    }
+
+    postDetailResponseDto.setReplies(replyResponseDtoList);
+
+    return ResponseUtil.returnResponse(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), postDetailResponseDto);
   }
 }

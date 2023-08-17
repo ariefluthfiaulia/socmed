@@ -7,11 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.postr.app.dto.request.PostRequestDto;
+import com.postr.app.dto.response.PostDetailResponseDto;
+import com.postr.app.dto.response.ReplyResponseDto;
 import com.postr.app.model.Post;
 import com.postr.app.model.Reply;
 import com.postr.app.model.User;
@@ -21,6 +21,7 @@ import com.postr.app.repository.UserRepository;
 import com.postr.app.service.impl.PostServiceImpl;
 import com.postr.app.util.ResponseUtil;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -177,32 +178,60 @@ public class PostServiceTest {
   public void testGetDetailPost_Success() {
     // Arrange
     String postId = "postId";
+
+    User user = new User();
+    user.setUsername("user123");
+
     Post post = new Post();
     post.setId(postId);
+    post.setUser(user);
+    post.setContent("Post content");
+
     Reply reply1 = new Reply();
+    reply1.setId("replyId1");
+    reply1.setUser(user);
+    reply1.setContent("Reply content 1");
+
     Reply reply2 = new Reply();
-    List<Reply> replies = new ArrayList<>();
-    replies.add(reply1);
-    replies.add(reply2);
+    reply2.setId("replyId2");
+    reply2.setUser(user);
+    reply2.setContent("Reply content 2");
+
+    List<Reply> replies = Arrays.asList(reply1, reply2);
 
     when(postRepository.findById(postId)).thenReturn(Optional.of(post));
-    when(replyRepository.findByPostOrderByCreatedDateDesc(post)).thenReturn(replies);
+    when(replyRepository.findByPostOrderByCreatedDate(post)).thenReturn(replies);
 
     // Act
     ResponseEntity<Map<String, Object>> response = postService.getDetailPost(postId);
 
     // Assert
-    verify(postRepository).findById(postId);
-    verify(replyRepository).findByPostOrderByCreatedDateDesc(post);
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals("OK", response.getBody().get(ResponseUtil.RESPONSE_API_STATUS_MESSAGE));
 
-    assertEquals(HttpStatus.OK.value(), response.getStatusCode().value());
-    assertEquals(post, response.getBody().get(ResponseUtil.RESPONSE_API_BODY));
+    PostDetailResponseDto responseBody = (PostDetailResponseDto) response.getBody().get(ResponseUtil.RESPONSE_API_BODY);
+
+    assertNotNull(responseBody);
+    assertEquals("user123", responseBody.getUsername());
+    assertEquals("Post content", responseBody.getContent());
+
+    List<ReplyResponseDto> replyDtos = responseBody.getReplies();
+    assertNotNull(replyDtos);
+    assertEquals(2, replyDtos.size());
+
+    ReplyResponseDto replyDto1 = replyDtos.get(0);
+    assertEquals("user123", replyDto1.getUsername());
+    assertEquals("Reply content 1", replyDto1.getContent());
+
+    ReplyResponseDto replyDto2 = replyDtos.get(1);
+    assertEquals("user123", replyDto2.getUsername());
+    assertEquals("Reply content 2", replyDto2.getContent());
   }
 
   @Test
   public void testGetDetailPost_PostNotFound() {
     // Arrange
-    String postId = "nonExistentPostId";
+    String postId = "nonExistentId";
 
     when(postRepository.findById(postId)).thenReturn(Optional.empty());
 
@@ -210,10 +239,7 @@ public class PostServiceTest {
     ResponseEntity<Map<String, Object>> response = postService.getDetailPost(postId);
 
     // Assert
-    verify(postRepository).findById(postId);
-    verifyNoInteractions(replyRepository);
-
-    assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
+    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     assertEquals("Post not found", response.getBody().get(ResponseUtil.RESPONSE_API_STATUS_MESSAGE));
   }
 }

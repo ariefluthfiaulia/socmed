@@ -44,6 +44,7 @@ The Postr application API will include the following endpoints:
   }
   ```
 - `[POST] /api/posts`: Create a new post.
+
 **Sample Request:**
 ```json
   {
@@ -105,22 +106,16 @@ The Postr application API will include the following endpoints:
 ```json
   {
     "body": {
-      "id": "2c94a08189ff81310189ff8af6270001",
+      "username": "Joni",
       "content": "Post Test Joni",
-      "user": {
-        "id": "2c94a08189ff81310189ff8861430000",
-        "username": "Joni"
-      },
-      "createdDate": "2023-08-16T18:10:44.391+00:00",
       "replies": [
         {
-          "id": "2c94a08189ff81310189ff91e84b0003",
-          "content": "Reply Post Joni",
-          "user": {
-            "id": "2c94a08189ff5c3b0189ff6550ad0000",
-            "username": "Amran"
-          },
-          "createdDate": "2023-08-16T18:18:19.595+00:00"
+          "username": "Amran",
+          "content": "Reply Post Joni"
+        },
+        {
+          "username": "Joni",
+          "content": "Reply reply-an nya pak amran"
         }
       ]
     },
@@ -142,13 +137,22 @@ The Postr application API will include the following endpoints:
 ```json
   {
     "body": {
-      "id": "2c94a08189ff81310189ff91e84b0003",
-      "content": "Reply Post Joni",
+      "id": "2c94a0818a01de73018a01deb79e0000",
+      "content": "Balas lagi",
       "user": {
         "id": "2c94a08189ff5c3b0189ff6550ad0000",
         "username": "Amran"
       },
-      "createdDate": "2023-08-16T18:18:19.595+00:00"
+      "post": {
+        "id": "2c94a08189ff81310189ff8af6270001",
+        "content": "Post Test Joni",
+        "user": {
+          "id": "2c94a08189ff81310189ff8861430000",
+          "username": "Joni"
+        },
+        "createdDate": "2023-08-16T18:10:44.391+00:00"
+      },
+      "createdDate": "2023-08-17T05:01:27.836+00:00"
     },
     "statusMessage": "OK",
     "statusCode": 200
@@ -156,3 +160,13 @@ The Postr application API will include the following endpoints:
   ```
   The focus of this project is to provide a functional backend API that supports the basic requirements of the Postr
   application.
+
+## How to Run
+- Clone the repository using this command `git clone https://github.com/ariefluthfiaulia/socmed.git`.
+- Make sure you have installed PostgreSQL on your local computer.
+- Create a database named "postr".
+- Adjust the database credentials in the `application.properties` file to match your database settings.
+- The default credentials for this application are:
+  - Username: postgres
+  - Password: postgres
+- Run the application using the IDE that you like the most.

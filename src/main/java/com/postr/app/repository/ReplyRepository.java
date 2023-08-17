@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ReplyRepository extends CommonRepository<Reply, String> {
 
-  List<Reply> findByPostOrderByCreatedDateDesc(Post post);
+  List<Reply> findByPostOrderByCreatedDate(Post post);
 }
